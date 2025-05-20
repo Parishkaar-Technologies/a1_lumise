@@ -64,7 +64,8 @@ class lumise_tmpl_register
 					<hr>
 					<button id="a1_dottedgrid">Set of Extendable dotted grid</button>
 					<hr>
-					<button id="exampleThreeLines">Insert Three Lines</button>
+					<button id="a1_dotgrid">Set of Extendable Dot Grids</button>
+
 					'
 			),
 
