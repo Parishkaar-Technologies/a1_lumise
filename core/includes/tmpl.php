@@ -62,9 +62,9 @@ class lumise_tmpl_register
 					</header>
 					<button id="a1_lines">Set of Extendable Lines</button>
 					<hr>
-					<button id="a1_dottedgrid">Set of Extendable dotted grid</button>
-					<hr>
 					<button id="a1_dotgrid">Set of Extendable Dot Grids</button>
+					<hr>
+					<button id="a1_box">Bordered Box With No Fill</button>
 
 					'
 			),
