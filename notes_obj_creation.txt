@@ -644,3 +644,349 @@ const colorInput = document.getElementById("a1_edit_dotted_color");
         createOrUpdateDotGrid(meta, true);
       }
     });
+
+
+    TODO: 
+    
+        Add to Cart
+        Download PDF 
+        Backend View in Lumise Editor 
+        bug fix for text-fx eg. CurvedText
+        px to be in inches and cm. 
+
+        1. Name your design
+        2. Guest saving - temporary 
+        3. logo
+        4. Undo redo as icons
+        5. Load... Saved Designs ... Save... Save to Your Account
+        5.1 Save to Account, Save to Cart [+auto save the design]
+        6. Options ... Template and replace image to be removed.
+        7. CLone... copy
+        8. Reduce box thickness further down
+
+        
+        Package feature: tag-based saving feature specific to an account
+        tag-based search (favorites is also a user-specific tag)
+        Change Prodcut to be changed to RESIZE PAGE (Planner Page)
+
+Subscribers to A1 [logged in users]
+Non-Subscribers 
+  - Logged in users [buying other physical products]
+  - Guest users 
+
+  Orders Page
+   - Three types - Physical (planners and supplies), Printed Products, Downloads [PDF printables]
+   - Icons to be showed. 
+   - Planners and Supplies: 
+      - the word Action to be removed. Button name should be View Order
+      - Center the column headers 
+      - Reorder Btn inside Order Details [not on order list page]
+
+  - Planners and Supplies, Printed Products and PDF Printables
+    Inside Order details
+      - Product image
+      - Product Name [Planner Page] 
+      - Design Name 
+      - Amount Paid
+      - Reorder Btn 
+      - Edit Design Btn [exclusive for Printed products and PDFs]
+
+
+Thanks to you - we have now been able to include a1_lineset, a1_dotgrid and a1_box by forking Lumsie plugin. Now taking this forward - as you know - we have blocked the controls of lumise using below example code: 
+
+
+      group.setControlsVisibility({
+        mt: false, mb: false, ml: false, mr: false,
+        bl: false, br: false, tl: false, tr: false, mtr: false
+      });
+
+      group.hasControls = false;
+      group.hasBorders = true;
+
+and then using our own live edit listeners we achieved our objective. Thats what we have been doing so far. But is it possible to create our own controls/handles with custom functions that will perform editing tasks. For example, increase/decrease width if right/left side handles are dragged in/out . Let me know if this is possible. I have ideas on what handle will perform what task which I can share with you (examples: A duplicate icon can be on one corner. delete icon can be in another corner). 
+
+
+Please note: 
+
+1. These handles should appear for specified custom objects only - not for any lumise default objects. 
+2. The handles should be attached to the object. move along with the object as we keep moving it on canvas or editing. 
+3. the handles should not be part of the design. 
+4. handles should disappear once the object is not selected. 
+
+
+Plan for a1_linesets:
+1. There will be four handles - each placed excactly at the center of each side. 
+2. These handles are very small square handles in grey color. 
+3. Handles are created by using fabric.js (instead of importing as svg or images) each time the object is clicked. 
+4. Handle on the right when dragged will increase/decrease the width of the linesets on the right side. 
+5. Handle on the left when dragged will increase/decrease the width of the linesets on the left side. 
+6. Handle on the bottom when dragged will increase/decrease number of lines from bottom - keeping spacing same.
+7. Handle on the top when dragged will increase/decrease number of lines from top - keeping spacing same. 
+8. There will be four additional corner buttons that perform delete, duplicate, rotate and scale. 
+9. delete, duplicate and rotate are self explainatory. For Scaling, I mean all three aspects should scale - width of the lines, number of lines, spacing of lines. Scaling seems to be the most complex function. 
+
+
+a1_lineset definition inside lumise: {} function: 
+
+"a1_lineset": function (ops, callback) {
+          const lines = [];
+
+          if (Array.isArray(ops.objects)) {
+            ops.objects.forEach(obj => {
+              const line = new fabric.Line([obj.x1, obj.y1, obj.x2, obj.y2], {
+                ...obj, // preserve all original properties
+                stroke: obj.stroke || obj.fill || '#000000', // prefer stroke, fallback to fill or black
+                strokeWidth: obj.strokeWidth || 2,
+                left: obj.left,
+                top: obj.top,
+                originX: obj.originX || 'center',
+                originY: obj.originY || 'center',
+                opacity: obj.opacity !== undefined ? obj.opacity : 1,
+                visible: obj.visible !== false,
+                selectable: false,
+                evented: false,
+              });
+              lines.push(line);
+            });
+          }
+
+          const group = new fabric.Group(lines, {
+            left: ops.left,
+            top: ops.top,
+            originX: ops.originX || 'center',
+            originY: ops.originY || 'center',
+            type: 'a1_lineset',
+            name: ops.name || 'Line Set',
+            angle: ops.angle || 0,
+            scaleX: ops.scaleX || 1,
+            scaleY: ops.scaleY || 1,
+            selectable: true,
+            evented: true,
+            opacity: ops.opacity !== undefined ? ops.opacity : 1,
+            visible: ops.visible !== false,
+            metadata: ops.metadata || {},
+            // 🚫 DO NOT set group-level fill/stroke
+          });
+
+          console.log('✅ Reconstructed a1_lineset group with', lines.length, 'lines:', group);
+
+          callback(group);
+        },
+
+  Creating a1_lineset on First initialization through a button: 
+document.getElementById("a1_lines")?.addEventListener("click", function () {
+      const defaultMeta = {
+        numLines: 3,
+        spacing: 20,
+        width: 100,
+        color: "#000000",
+        thickness: 2
+      };
+
+      document.getElementById("a1_edit_thickness").value = defaultMeta.thickness;
+      document.getElementById("a1_thickness_val").textContent = defaultMeta.thickness;
+
+
+      // Pre-fill edit modal with new values
+      document.getElementById("a1_edit_num_lines").value = defaultMeta.numLines;
+      document.getElementById("a1_edit_spacing").value = defaultMeta.spacing;
+      document.getElementById("a1_edit_width").value = defaultMeta.width;
+      document.getElementById("a1_edit_color").value = defaultMeta.color;
+
+      // Show modal
+      document.getElementById("a1_modal_overlay").style.display = "block";
+      document.getElementById("a1_edit_form").style.display = "block";
+
+      // ✅ Actually create a new instance (DO NOT remove any group)
+      const lines = [];
+      for (let i = 0; i < defaultMeta.numLines; i++) {
+        lines.push(new fabric.Line([0, i * defaultMeta.spacing, defaultMeta.width, i * defaultMeta.spacing], {
+          stroke: defaultMeta.color,
+          strokeWidth: 2
+        }));
+      }
+
+      const limit = lumise.stage().limit_zone;
+      const canvas = lumise.stage().canvas;
+
+      const group = new fabric.A1LineSet(lines, {
+        left: limit.left + limit.width / 2,
+        top: limit.top + limit.height / 2,
+        originX: 'center',
+        originY: 'center',
+        name: 'a1_lineset',
+        id: 'a1_lineset_' + Date.now(),
+        metadata: defaultMeta
+      });
+
+      group.setControlsVisibility({
+        mt: false, mb: false, ml: false, mr: false,
+        bl: false, br: false, tl: false, tr: false, mtr: false
+      });
+
+      group.hasControls = false;
+      group.hasBorders = true;
+
+      canvas.add(group);
+      canvas.setActiveObject(group);
+      canvas.renderAll();
+
+      // 🧠 Set as active group for editing
+      window._a1_active_group = group;
+    });
+
+    Live Editing through sliders in Modal:
+    ['num_lines', 'spacing', 'width', 'color', 'thickness'].forEach(field => {
+      const input = document.getElementById(`a1_edit_${field}`);
+      const output = document.getElementById(`a1_${field}_val`);
+
+      input?.addEventListener('input', () => {
+        if (output && input.type === 'range') {
+          output.textContent = input.value;
+        }
+
+        const meta = {
+          numLines: parseInt(document.getElementById("a1_edit_num_lines")?.value || "0", 10),
+          spacing: parseInt(document.getElementById("a1_edit_spacing")?.value || "0", 10),
+          width: parseInt(document.getElementById("a1_edit_width")?.value || "0", 10),
+          color: document.getElementById("a1_edit_color")?.value || "#000000",
+          thickness: parseInt(document.getElementById("a1_edit_thickness")?.value || "2", 10)
+        };
+
+        if (
+          meta.numLines > 0 &&
+          meta.spacing > 0 &&
+          meta.width > 0 &&
+          meta.color &&
+          meta.thickness > 0 &&
+          window._a1_active_group
+        ) {
+          createOrUpdateLineset(meta, true); // isEdit = true
+        }
+      });
+    });
+
+    And finally, here is createOrUpdateLineset and duplicating listener functions are given below: 
+
+function createOrUpdateLineset(meta, isEdit = false) {
+      const canvas = lumise.stage().canvas;
+
+      // 🧹 Remove previous group if any
+      if (window._a1_active_group && canvas.contains(window._a1_active_group)) {
+        canvas.remove(window._a1_active_group);
+      }
+
+      const lines = [];
+
+      for (let i = 0; i < meta.numLines; i++) {
+        lines.push(new fabric.Line([0, i * meta.spacing, meta.width, i * meta.spacing], {
+          stroke: meta.color,
+          strokeWidth: meta.thickness || 2,
+          originX: 'center',
+          originY: 'center',
+          selectable: false,
+          evented: false
+        }));
+      }
+
+      const limit = lumise.stage().limit_zone;
+      const x = limit.left + limit.width / 2;
+      const y = limit.top + limit.height / 2;
+
+      const group = new fabric.Group(lines, {
+        left: window._a1_active_group?.left || x,
+        top: window._a1_active_group?.top || y,
+        originX: 'center',
+        originY: 'center',
+        name: 'a1_lineset',
+        id: 'a1_lineset_' + Date.now(),
+        metadata: meta,
+        object_type: 'a1_lineset',
+        object_id: 'a1_lineset_' + Date.now(),
+        selectable: true,
+        evented: true
+      });
+
+      group.setControlsVisibility({
+        mt: false, mb: false, ml: false, mr: false,
+        bl: false, br: false, tl: false, tr: false, mtr: false
+      });
+
+      group.hasControls = false;
+      group.hasBorders = true;
+
+      canvas.add(group);
+      canvas.setActiveObject(group);
+      canvas.renderAll();
+
+      window._a1_active_group = group;
+
+      return group;
+    }
+
+Duplicating Lineset: 
+
+document.getElementById('a1-duplicate-lineset').addEventListener('click', function () {
+      if (!window._a1_active_group || !window._a1_active_group.metadata) {
+        alert("No active lineset to duplicate.");
+        return;
+      }
+
+      const originalMeta = window._a1_active_group.metadata;
+
+      // Create a shallow copy of metadata and give it a new ID
+      const newMeta = {
+        ...originalMeta,
+        // Optional: tweak if needed
+      };
+
+      // Offset the new group a bit
+      const limit = lumise.stage().limit_zone;
+      const x = (window._a1_active_group.left || limit.left) + 40;
+      const y = (window._a1_active_group.top || limit.top) + 40;
+
+      // Assign new metadata ID
+      const newId = 'a1_lineset_' + Date.now();
+      newMeta.object_id = newId;
+
+      const canvas = lumise.stage().canvas;
+
+      const lines = [];
+      for (let i = 0; i < newMeta.numLines; i++) {
+        lines.push(new fabric.Line([0, i * newMeta.spacing, newMeta.width, i * newMeta.spacing], {
+          stroke: newMeta.color,
+          strokeWidth: newMeta.thickness || 2
+        }));
+      }
+
+      const group = new fabric.Group(lines, {
+        left: x,
+        top: y,
+        originX: 'center',
+        originY: 'center',
+        name: 'a1_lineset',
+        id: newId,
+        metadata: newMeta,
+        object_type: 'a1_lineset',
+        object_id: newId,
+        selectable: true,
+        evented: true
+      });
+
+      group.setControlsVisibility({
+        mt: false, mb: false, ml: false, mr: false,
+        bl: false, br: false, tl: false, tr: false, mtr: false
+      });
+
+      group.hasControls = false;
+      group.hasBorders = false;
+
+      canvas.add(group);
+      canvas.setActiveObject(group);
+      canvas.renderAll();
+
+      // Update global reference
+      window._a1_active_group = group;
+
+      alert('✅ Line group duplicated!');
+    });
