@@ -990,3 +990,26 @@ document.getElementById('a1-duplicate-lineset').addEventListener('click', functi
 
       alert('✅ Line group duplicated!');
     });
+
+    01 June 2025
+
+    1. Handles should increase or decrease width in the direction that they are pulled to. [applicable to top and bottom handles]
+
+    2. Canvas area border radius should be zero. 
+
+    3. canvas border dots should be thinner. 
+
+    4. corner handles to be disabled for now. 
+
+    5. dot thickness can go < 1 max 5
+
+    6. remove grey overlay on live editing. 
+
+    7. dot grid: space x and space y to be merged into one spacing. 
+
+    8. Color CMYK. 
+
+    9. A1_Box Fill color. 
+
+    10. Line Styles: dashed (- - - ), dotted (...), solid, handdrawn 
+

@@ -65,6 +65,8 @@ class lumise_tmpl_register
 					<button id="a1_dotgrid">Set of Extendable Dot Grids</button>
 					<hr>
 					<button id="a1_box">Bordered Box With No Fill</button>
+					<hr>
+					<button id="a1_checkboxes">Set of Extendable Checkboxes</button>
 
 					'
 			),

@@ -1,0 +1,155 @@
+Create A1_CheckBoxes
+
+In my project to create custom objects within Lumsie, my next task is to create extendable a1_checkboxes. Let me explain you how the shape should appear. 
+
+1. A checkbox is a perfect square.
+2. A1_CheckBoxes are set of checkboxes lined up one below another, separated by a spacing variable.
+3. Similar to a1_lineset, on inital setup, 3 checkboxes line up one below another and form a group.
+4. The variables shall be as follows: 
+Number of Boxes: a1_checkboxes_number_boxes
+Spacing between the boxes: a1_checkboxes_spacing
+Size of each checkbox: a1_checkboxes_width
+Color of checkboxes: a1_checkboxes_color
+
+The HTML form used in the modal will be as follows:
+
+<div id="a1_checkboxes_form" style="display: none; position: fixed; top: 100px; left: 5%; width: 320px; background: #fff; border: 1px solid #ccc; padding: 16px; border-radius: 8px; z-index: 10000; box-shadow: 0 0 15px rgba(0,0,0,0.3); font-family: sans-serif;">
+          <h4 style="margin-top: 0;">Edit Line Group</h4>
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="width: 130px;">Number of Boxes</label>
+            <input type="range" id="a1_checkboxes_num_boxes" min="1" max="20" value="3" style="flex: 1;">
+            <span id="a1_checkboxes_num_boxes_val" style="width: 30px; text-align: right;">3</span>
+          </div>
+
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="width: 130px;">Spacing between boxes</label>
+            <input type="range" id="a1_checkboxes_spacing" min="5" max="100" value="20" style="flex: 1;">
+            <span id="a1_checkboxes_spacing_val" style="width: 30px; text-align: right;">20</span>
+          </div>
+
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="width: 130px;">Box Width (px)</label>
+            <input type="range" id="a1_checkboxes_width" min="10" max="800" value="10" style="flex: 1;">
+            <span id="a1_checkboxes_width_val" style="width: 40px; text-align: right;">10</span>
+          </div>
+
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="width: 130px;">Border Thickness (px)</label>
+            <input type="range" id="a1_checkboxes_thickness" min="1" max="10" value="2" style="flex: 1;">
+            <span id="a1_checkboxes_thickness_val" style="width: 40px; text-align: right;">2</span>
+          </div>
+
+          <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <label style="width: 130px;">Border Color</label>
+            <input type="color" id="a1_checkboxes_color" value="#000000">
+          </div>
+
+          <div style="margin-top: 15px; text-align: right;">
+          <button id="a1_checkboxes_delete_group" class="small-button delete-button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              Trash
+            </button>
+            
+            <button id="a1_checkboxes_duplicate" class="small-button duplicate-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 2h8v8H8V2zm8 14h8v8h-8v-8z"/></svg>
+              Clone
+            </button>
+            <button id="a1_checkboxes_cancel" class="small-button done-button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+              Done 
+            </button>
+          </div>
+        </div>
+
+I have done the code for defining A1Checkboxes as below
+
+   // 1. Define custom class for a1_checkboxes
+  // Define your custom group class correctly
+  fabric.A1Checkboxes = fabric.util.createClass(fabric.Group, {
+    type: 'a1_checkboxes',
+
+    initialize: function (objects, options) {
+      options = options || {};
+      this.callSuper('initialize', objects, options);
+      this.set({
+        id: options.id || '',
+        metadata: options.metadata || {}
+      });
+    },
+
+    toObject: function (propertiesToInclude) {
+      return fabric.util.object.extend(this.callSuper('toObject', propertiesToInclude), {
+        id: this.id,
+        metadata: this.metadata
+      });
+    }
+  });
+
+  fabric.A1Checkboxes.fromObject = function (object, callback) {
+    console.log("🌀 Rehydrating A1Checkboxes", object);
+
+    fabric.util.enlivenObjects(object.objects, function (enlivenedObjects) {
+      const options = fabric.util.object.clone(object);
+      delete options.objects;
+
+      const group = new fabric.A1LineSet(enlivenedObjects, options);
+      callback && callback(group);
+    });
+  };
+
+  // ✅ This is the key to make Lumise recognize the type
+  fabric['a1_checkboxes'] = fabric.A1Checkboxes;
+
+
+I now need to write case function for a1_checkboxes that will make lumise recongize this object. 
+
+Below I am providing the working code of a1_lineset inside lumise: { ... }.
+
+"a1_lineset": function (ops, callback) {
+    const lines = [];
+
+    if (Array.isArray(ops.objects)) {
+      ops.objects.forEach(obj => {
+        const line = new fabric.Line([obj.x1, obj.y1, obj.x2, obj.y2], {
+          ...obj, // preserve all original properties
+          stroke: obj.stroke || obj.fill || '#000000', // prefer stroke, fallback to fill or black
+          strokeWidth: obj.strokeWidth || 2,
+          left: obj.left,
+          top: obj.top,
+          originX: obj.originX || 'center',
+          originY: obj.originY || 'center',
+          opacity: obj.opacity !== undefined ? obj.opacity : 1,
+          visible: obj.visible !== false,
+          selectable: false,
+          evented: false,
+        });
+        lines.push(line);
+      });
+    }
+
+    const group = new fabric.Group(lines, {
+      left: ops.left,
+      top: ops.top,
+      originX: ops.originX || 'center',
+      originY: ops.originY || 'center',
+      type: 'a1_lineset',
+      name: ops.name || 'Line Set',
+      angle: ops.angle || 0,
+      scaleX: ops.scaleX || 1,
+      scaleY: ops.scaleY || 1,
+      selectable: true,
+      evented: true,
+      opacity: ops.opacity !== undefined ? ops.opacity : 1,
+      visible: ops.visible !== false,
+      metadata: ops.metadata || {},
+      // 🚫 DO NOT set group-level fill/stroke
+    });
+
+    console.log('✅ Reconstructed a1_lineset group with', lines.length, 'lines:', group);
+
+    callback(group);
+  },
+
+  Can you generate code for a1_checkboxes given the above instruction, similar to a1_lineset structure. 
+
+  Later we will create function for createOrReplaceCheckBoxes(). 
