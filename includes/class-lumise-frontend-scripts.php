@@ -191,6 +191,11 @@ class Lumise_Frontend_Scripts {
 				'deps'    => array( 'lumise-jquery', 'lumise-vendors' ),
 				'version' => LUMISE,
 			),
+			// 'a1-scripts'     => array(
+			// 	'src'     => self::get_asset_url( 'assets/js/a1_lineset.js'),
+			// 	'deps'    => array( 'lumise-jquery', 'lumise-vendors', 'lumise-app' ),
+			// 	'version' => LUMISE,
+			// ),
 			
 		);
 		/* if ( $lumise->cfg->load_jquery ) {
