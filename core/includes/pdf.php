@@ -9,4 +9,4 @@
 */
 
 global $lumise;
-echo 434334;
+// echo 434334;

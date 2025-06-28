@@ -658,8 +658,8 @@ const colorInput = document.getElementById("a1_edit_dotted_color");
         2. Guest saving - temporary 
         3. logo
         4. Undo redo as icons
-        5. Load... Saved Designs ... Save... Save to Your Account
-        5.1 Save to Account, Save to Cart [+auto save the design]
+        5. Load... Open ... Save... Save to Your Account
+        5.1 Save to Account, Save to Cart [+auto save the design] ... For Edit purposes
         6. Options ... Template and replace image to be removed.
         7. CLone... copy
         8. Reduce box thickness further down
@@ -1013,3 +1013,30 @@ document.getElementById('a1-duplicate-lineset').addEventListener('click', functi
 
     10. Line Styles: dashed (- - - ), dotted (...), solid, handdrawn 
 
+26 June 2025
+Folder functionality for organizing Designs
+PDF download for free; 
+
+basic membership... first 100 ... 
+
+alert box on duplicate and saving. 
+
+printing should remove text and handles
+
+
+Signup as Google [APIs required]
+
+Toolbar at the top, organized consistently (example color fill)
+
+menu items: Left: Open, Save, Save As.  Far-right: Print, Download [move undo redo to toolbar]
+
+Print [add to cart]
+CONFIRM product choices: size, color, quantity
+
+Product Attributes 
+Greyscale or Color: Previewed before placing order,  
+How many copies -> for printing ... increase in number of pages can decrease the total cost.
+
+Toggling between Greyscale or Color option will show the color pallete or greyscale pallete. 
+
+Dimensions -> in cm/inches ->  in relation to the actual paper size. 
