@@ -4,7 +4,7 @@
  * Plugin Name: Lumise - Product Designer Tool
  * Plugin URI: https://www.lumise.com/
  * Description: The professional solution for designing & printing online
- * Version: 2.0.6
+ * Version: 2.0.6.1
  * Author: King-Theme
  * Author URI: https://www.lumise.com/
  * Text Domain: lumise
