@@ -51,8 +51,8 @@ UI Part for linesets:
             </button>
           </div>
         </div>
-
 1. a1_lineset definition inside lumise: {}. Here is the code below:
+
 "a1_lineset": function (ops, callback) {
           const lines = [];
 
